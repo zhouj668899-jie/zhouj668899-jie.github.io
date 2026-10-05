@@ -1,0 +1,46 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const d = post.data.date;
+const date = `${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日`;
+---
+
+<Base title={post.data.title} description={post.data.summary}>
+  <article class="wrap article">
+    <a href="/blog/" class="back">← 全部文章</a>
+    <h1>{post.data.title}</h1>
+    <p class="meta">Jay · {date}</p>
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  .article { max-width: 720px; padding-top: 48px; padding-bottom: 80px; }
+  .back { font-size: 14px; font-weight: 600; }
+  h1 { font-size: clamp(28px, 4.4vw, 38px); font-weight: 800; margin-top: 20px; }
+  .meta { color: var(--muted); font-size: 14px; margin: 12px 0 32px; }
+  .prose { font-size: 17px; line-height: 1.9; }
+  .prose :global(h2) { font-size: 24px; margin: 40px 0 12px; }
+  .prose :global(h3) { font-size: 19px; margin: 28px 0 8px; }
+  .prose :global(p) { margin: 0 0 18px; }
+  .prose :global(ul), .prose :global(ol) { padding-left: 1.4em; margin: 0 0 18px; }
+  .prose :global(li) { margin: 6px 0; }
+  .prose :global(blockquote) {
+    margin: 0 0 18px; padding: 10px 18px; border-left: 4px solid var(--accent);
+    background: var(--accent-soft); border-radius: 0 12px 12px 0; color: var(--ink-2);
+  }
+  .prose :global(code) { font-size: 0.9em; background: var(--accent-soft); padding: 2px 6px; border-radius: 6px; }
+  .prose :global(pre) { overflow-x: auto; padding: 16px; border-radius: 12px; background: #0f1b2d; color: #e8eef7; }
+  .prose :global(pre code) { background: none; padding: 0; }
+  .prose :global(img) { border-radius: 12px; margin: 8px 0 18px; }
+  .prose :global(table) { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 15px; display: block; overflow-x: auto; }
+  .prose :global(th), .prose :global(td) { border: 1px solid var(--line); padding: 8px 12px; text-align: left; }
+</style>

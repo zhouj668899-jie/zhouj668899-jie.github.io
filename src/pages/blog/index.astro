@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmt = (d: Date) => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<Base title="文章" description="Jay 写的文章：医疗器械工程、AI 工作流和一些做事的方法。">
+  <section class="wrap list">
+    <p class="eyebrow">文章</p>
+    <h1 class="section-title">写下来的东西</h1>
+    <p class="section-lead">医疗器械工程、AI 工作流，还有一些做事的方法。</p>
+    <ul>
+      {posts.map((p) => (
+        <li>
+          <a href={`/blog/${p.id}/`}>
+            <time>{fmt(p.data.date)}</time>
+            <strong>{p.data.title}</strong>
+            <span>{p.data.summary}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .list { padding-top: 56px; padding-bottom: 72px; max-width: 760px; }
+  ul { list-style: none; padding: 0; margin: 36px 0 0; }
+  li { border-top: 1px solid var(--line); }
+  li a { display: grid; gap: 4px; padding: 20px 0; color: var(--ink); }
+  li a:hover { text-decoration: none; }
+  li a:hover strong { color: var(--accent-ink); }
+  time { font-size: 13px; color: var(--muted); }
+  strong { font-size: 19px; }
+  span { color: var(--ink-2); font-size: 15px; }
+</style>

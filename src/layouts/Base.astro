@@ -1,0 +1,153 @@
+---
+import { SITE } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = SITE.description } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.name}` : SITE.title;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/img/jay-wave.png', Astro.site)} />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+  </head>
+  <body>
+    <header class="top">
+      <div class="wrap top-inner">
+        <a class="brand" href="/">
+          <img src="/img/avatar.jpg" alt="" width="32" height="32" />
+          <span>Jay</span>
+        </a>
+        <nav>
+          <a href="/#work">在做什么</a>
+          <a href="/#projects">作品</a>
+          <a href="/blog/" class:list={{ on: path.startsWith('/blog') }}>文章</a>
+          <a href="/#join" class="cta">加入 / 合作</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="wrap foot-inner">
+        <span>© {new Date().getFullYear()} Jay</span>
+        <span><a href={SITE.github} target="_blank" rel="noopener">GitHub</a> · 用 Astro 搭建，托管在 GitHub Pages</span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #f3f7fc;
+    --surface: #ffffff;
+    --ink: #0f1b2d;
+    --ink-2: #44546a;
+    --muted: #7a889b;
+    --line: #dde5ef;
+    --accent: #1d6ff2;
+    --accent-soft: #e4eefe;
+    --accent-ink: #0b4fc0;
+    --warm: #ff8a3d;
+    --radius: 18px;
+    --shadow: 0 1px 2px rgba(15, 27, 45, 0.04), 0 8px 24px rgba(15, 27, 45, 0.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c121c;
+      --surface: #141c29;
+      --ink: #e8eef7;
+      --ink-2: #b3c0d2;
+      --muted: #7f8ea3;
+      --line: #243042;
+      --accent: #5b9bff;
+      --accent-soft: #17284a;
+      --accent-ink: #9cc2ff;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent-ink); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  img { max-width: 100%; height: auto; display: block; }
+  h1, h2, h3 { line-height: 1.3; margin: 0; letter-spacing: -0.01em; }
+
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 720px) { .wrap { padding: 0 28px; } }
+
+  .section { padding: 72px 0; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--accent-ink);
+    margin-bottom: 10px;
+  }
+  .section-title { font-size: clamp(26px, 4vw, 34px); font-weight: 750; }
+  .section-lead { color: var(--ink-2); margin: 12px 0 0; max-width: 620px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  /* 顶栏 */
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(1.4) blur(12px);
+    -webkit-backdrop-filter: saturate(1.4) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 750; font-size: 18px; color: var(--ink); }
+  .brand:hover { text-decoration: none; }
+  .brand img { width: 32px; height: 32px; border-radius: 50%; }
+  .top nav { display: flex; align-items: center; gap: 4px; }
+  .top nav a {
+    color: var(--ink-2); font-size: 15px; padding: 6px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .top nav a:hover, .top nav a.on { color: var(--ink); background: var(--accent-soft); text-decoration: none; }
+  .top nav a.cta { background: var(--accent); color: #fff; font-weight: 600; margin-left: 4px; }
+  .top nav a.cta:hover { background: var(--accent-ink); color: #fff; }
+  @media (max-width: 560px) {
+    .top nav a:not(.cta):not([href='/blog/']) { display: none; }
+    .brand span { display: none; }
+  }
+
+  /* 页脚 */
+  .foot { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
+  .foot-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+  .foot a { color: var(--ink-2); }
+</style>
